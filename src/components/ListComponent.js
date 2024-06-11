@@ -1,40 +1,35 @@
 import React, { useState } from 'react'
 
 const ListComponent = (props) => {
-    const [updateQuantity, setUpdateQuantity] = useState();
-    const [isEdit, setIsEdit] = useState(false);
-    const [val, setVal] = useState()
+    
+    const [updateQuantity, setUpdateQuantity] = useState({});
+    const [isEdit, setIsEdit] = useState({});
+    
     const handleDelete = (event) => {
         props.onDeleteData(event.target.id)
         
     }
 
-    useState(()=>{
-
-    },[])
- 
 
     const handleQuantityChange = (event) => {
-        const filterQuantity = props.vegitableData.filter((item) => {
-            return item.id == event.target.id;
-        })
-
-        let {quantity} = filterQuantity[0];
-        const diff = quantity - (+event.target.value);
-        setVal(event.target.value)
-        
-        setUpdateQuantity(diff)
-        
-        
-
+        const itemId = event.target.id;
+        const item = props.vegitableData.find((item) => item.id == itemId);
+        const diff = item.quantity - (+event.target.value);
+     
+        setUpdateQuantity(prevState => ({
+            ...prevState,
+            [itemId]: diff
+        }));
     }
 
 
     const handleQuantitySubmit = (event) => {
-
         event.preventDefault();
-        setIsEdit(true)
-        
+        const itemId = event.target.elements[0].id;
+        setIsEdit(prevState => ({
+            ...prevState,
+            [itemId]: true
+        }));
     }
 
 
@@ -49,8 +44,10 @@ return (
             <span style={{marginRight:"10px"}}>{item.vegName}</span>
             <span style={{marginRight:"10px"}}>Rs : {item.price}</span>
           
-            <span style={{marginRight:"10px"}}>{isEdit? updateQuantity : item.quantity} kg</span>
+            {/* //<span style={{marginRight:"10px"}}>{isEdit? updateQuantity : item.quantity} kg</span> */}
            
+            <span style={{ marginRight: "10px" }}>{isEdit[item.id] ? updateQuantity[item.id] : item.quantity} kg</span>
+
            <form  onSubmit={handleQuantitySubmit}>
             <input 
             id={item.id}
@@ -60,11 +57,7 @@ return (
             placeholder='0'
             type='number'/>
             <button type='submit'  style={{marginRight:"10px"}}>Buy</button>
-            </form>
-
-
-            
-            
+            </form>           
             <button type='button' id={item.id} onClick={handleDelete}>delete</button>
         </div>
     )
